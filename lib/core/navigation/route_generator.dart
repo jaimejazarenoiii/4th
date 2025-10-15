@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../features/splash/splash_page.dart';
 import '../../features/welcome/welcome_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/inventory/presentation/pages/spaces_page.dart';
+import '../../features/inventory/presentation/pages/create_space_page.dart';
 import '../../features/inventory/presentation/pages/storages_page.dart';
 import '../../features/inventory/presentation/pages/items_page.dart';
 import '../../features/inventory/domain/entities/space_entity.dart';
@@ -41,6 +43,12 @@ class RouteGenerator {
           settings: settings,
         );
 
+      case AppRoutes.createSpace:
+        return MaterialPageRoute(
+          builder: (_) => const CreateSpacePage(),
+          settings: settings,
+        );
+
       case AppRoutes.storages:
         if (args is SpaceEntity) {
           return MaterialPageRoute(
@@ -55,10 +63,8 @@ class RouteGenerator {
             args['space'] is SpaceEntity &&
             args['storage'] is StorageEntity) {
           return MaterialPageRoute(
-            builder: (_) => ItemsPage(
-              space: args['space'],
-              storage: args['storage'],
-            ),
+            builder: (_) =>
+                ItemsPage(space: args['space'], storage: args['storage']),
             settings: settings,
           );
         }
@@ -73,27 +79,24 @@ class RouteGenerator {
   static Route<dynamic> _errorRoute(String? routeName) {
     return MaterialPageRoute(
       builder: (_) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Error'),
-        ),
+        appBar: AppBar(title: const Text('Error')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 80,
-                color: Colors.red,
-              ),
+              const Icon(Icons.error_outline, size: 80, color: Colors.red),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Page Not Found',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 routeName != null ? 'Route: $routeName' : 'Unknown route',
-                style: const TextStyle(color: Colors.grey),
+                style: GoogleFonts.outfit(color: Colors.grey),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -110,4 +113,3 @@ class RouteGenerator {
     );
   }
 }
-

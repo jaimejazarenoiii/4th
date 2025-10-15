@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
-import '../../core/navigation/navigation_service.dart';
-import '../../core/navigation/app_routes.dart';
 import '../../core/constants/asset_constants.dart';
 import '../../core/constants/app_colors.dart';
 

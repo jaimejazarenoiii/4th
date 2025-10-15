@@ -22,7 +22,7 @@ class _AppWrapperState extends State<AppWrapper> {
   @override
   void initState() {
     super.initState();
-    
+
     // Ensure splash animations complete before navigation
     // Total time: 1500ms (logo) + 200ms (delay) + 1200ms (text) + 2000ms (pulse cycle) + 1000ms (extra) = 5900ms
     // Rounding to 6 seconds to ensure all animations complete smoothly
@@ -50,10 +50,7 @@ class _AppWrapperState extends State<AppWrapper> {
           NavigationService.replaceWith(AppRoutes.welcome);
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         }
       },
@@ -63,7 +60,7 @@ class _AppWrapperState extends State<AppWrapper> {
           if (!_minSplashTimePassed) {
             return const SplashPage();
           }
-          
+
           if (state is AuthChecking || state is AuthInitial) {
             // Show splash screen while checking authentication
             return const SplashPage();
@@ -76,9 +73,7 @@ class _AppWrapperState extends State<AppWrapper> {
           } else if (state is AuthLoading) {
             // Show loading screen during auth operations
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
+              body: Center(child: CircularProgressIndicator()),
             );
           } else {
             // Default to splash screen

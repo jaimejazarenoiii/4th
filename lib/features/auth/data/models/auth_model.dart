@@ -1,4 +1,5 @@
 import '../../domain/entities/auth_entity.dart';
+import 'auth_response_model.dart';
 
 class AuthModel extends AuthEntity {
   const AuthModel({
@@ -18,6 +19,21 @@ class AuthModel extends AuthEntity {
       name: json['name'] as String?,
       expiresAt: DateTime.parse(json['expiresAt'] as String),
       isAuthenticated: json['isAuthenticated'] as bool? ?? true,
+    );
+  }
+
+  /// Factory method to create AuthModel from API response
+  factory AuthModel.fromApiResponse(
+    AuthDataModel data, {
+    String? fallbackName,
+  }) {
+    return AuthModel(
+      token: data.token,
+      userId: data.user.id,
+      email: data.user.email,
+      name: data.user.name ?? fallbackName,
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
+      isAuthenticated: true,
     );
   }
 

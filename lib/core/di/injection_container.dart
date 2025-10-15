@@ -28,12 +28,14 @@ final sl = GetIt.instance;
 Future<void> init() async {
   //! Features - Auth
   // Auth BLoC
-  sl.registerFactory(() => AuthBloc(
-        checkAuthStatus: sl(),
-        signIn: sl(),
-        signUp: sl(),
-        signOut: sl(),
-      ));
+  sl.registerFactory(
+    () => AuthBloc(
+      checkAuthStatus: sl(),
+      signIn: sl(),
+      signUp: sl(),
+      signOut: sl(),
+    ),
+  );
 
   // Auth use cases
   sl.registerLazySingleton(() => CheckAuthStatus(sl()));
@@ -42,7 +44,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignOut(sl()));
 
   // Auth repository
-  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(sl(), sl<DioClient>()),
+  );
 
   //! Features - Inventory
   // Bloc
@@ -80,10 +84,7 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<InventoryLocalDataSource>(
-    () => InventoryLocalDataSourceImpl(
-      sharedPreferences: sl(),
-      uuid: sl(),
-    ),
+    () => InventoryLocalDataSourceImpl(sharedPreferences: sl(), uuid: sl()),
   );
 
   //! Core
@@ -96,4 +97,3 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 }
-

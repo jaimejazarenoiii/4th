@@ -9,6 +9,7 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String dashboard = '/dashboard';
   static const String spaces = '/spaces';
+  static const String createSpace = '/create-space';
   static const String storages = '/storages';
   static const String items = '/items';
 
@@ -16,4 +17,3 @@ class AppRoutes {
   // static const String settings = '/settings';
   // static const String profile = '/profile';
 }
-

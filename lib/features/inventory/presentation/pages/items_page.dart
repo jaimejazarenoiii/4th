@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/widgets/animated_page_wrapper.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/space_entity.dart';
@@ -14,17 +15,20 @@ class ItemsPage extends StatelessWidget {
   final SpaceEntity space;
   final StorageEntity storage;
 
-  const ItemsPage({
-    super.key,
-    required this.space,
-    required this.storage,
-  });
+  const ItemsPage({super.key, required this.space, required this.storage});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(storage.name),
+        title: Text(
+          storage.name,
+          style: GoogleFonts.outfit(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         elevation: 2,
       ),
       body: BlocBuilder<InventoryBloc, InventoryState>(
@@ -33,15 +37,23 @@ class ItemsPage extends StatelessWidget {
 
           if (state is InventoryLoaded) {
             try {
-              final currentSpace = state.spaces.firstWhere((s) => s.id == space.id);
-              currentStorage = currentSpace.storages.firstWhere((st) => st.id == storage.id);
+              final currentSpace = state.spaces.firstWhere(
+                (s) => s.id == space.id,
+              );
+              currentStorage = currentSpace.storages.firstWhere(
+                (st) => st.id == storage.id,
+              );
             } catch (e) {
-              return const Center(child: Text('Storage not found'));
+              return Center(
+                child: Text('Storage not found', style: GoogleFonts.outfit()),
+              );
             }
           }
 
           if (currentStorage == null) {
-            return const Center(child: Text('Storage not found'));
+            return Center(
+              child: Text('Storage not found', style: GoogleFonts.outfit()),
+            );
           }
 
           if (currentStorage.items.isEmpty) {
@@ -60,7 +72,7 @@ class ItemsPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'No items yet',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 18,
                         color: AppColors.black,
                       ),
@@ -68,7 +80,7 @@ class ItemsPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Tap + to add your first item',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 14,
                         color: AppColors.grey,
                       ),
@@ -107,7 +119,9 @@ class ItemsPage extends StatelessWidget {
 
   void _showAddEditItemDialog(BuildContext context, {ItemEntity? item}) {
     final nameController = TextEditingController(text: item?.name ?? '');
-    final descriptionController = TextEditingController(text: item?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: item?.description ?? '',
+    );
     final quantityController = TextEditingController(
       text: item?.quantity?.toString() ?? '',
     );
@@ -115,7 +129,10 @@ class ItemsPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(item == null ? 'Add Item' : 'Edit Item'),
+        title: Text(
+          item == null ? 'Add Item' : 'Edit Item',
+          style: GoogleFonts.outfit(),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -145,9 +162,7 @@ class ItemsPage extends StatelessWidget {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
             ],
           ),
@@ -155,7 +170,7 @@ class ItemsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
@@ -166,34 +181,37 @@ class ItemsPage extends StatelessWidget {
 
                 if (item == null) {
                   context.read<InventoryBloc>().add(
-                        AddItemEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                          quantity: quantity,
-                        ),
-                      );
+                    AddItemEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      quantity: quantity,
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateItemEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          itemId: item.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                          quantity: quantity,
-                        ),
-                      );
+                    UpdateItemEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      itemId: item.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      quantity: quantity,
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(item == null ? 'Add' : 'Save'),
+            child: Text(
+              item == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -219,14 +237,11 @@ class _ItemCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.green[100],
-          child: Icon(
-            Icons.inventory_2,
-            color: Colors.green[700],
-          ),
+          child: Icon(Icons.inventory_2, color: Colors.green[700]),
         ),
         title: Text(
           item.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +254,7 @@ class _ItemCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 'Quantity: ${item.quantity}',
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: 12,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w500,
@@ -250,23 +265,23 @@ class _ItemCard extends StatelessWidget {
         ),
         trailing: PopupMenuButton(
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit, size: 20),
-                  SizedBox(width: 8),
-                  Text('Edit'),
+                  const Icon(Icons.edit, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Edit', style: GoogleFonts.outfit()),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, size: 20, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text('Delete', style: GoogleFonts.outfit(color: Colors.red)),
                 ],
               ),
             ),
@@ -285,7 +300,9 @@ class _ItemCard extends StatelessWidget {
 
   void _showAddEditItemDialog(BuildContext context, {ItemEntity? item}) {
     final nameController = TextEditingController(text: item?.name ?? '');
-    final descriptionController = TextEditingController(text: item?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: item?.description ?? '',
+    );
     final quantityController = TextEditingController(
       text: item?.quantity?.toString() ?? '',
     );
@@ -293,7 +310,10 @@ class _ItemCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(item == null ? 'Add Item' : 'Edit Item'),
+        title: Text(
+          item == null ? 'Add Item' : 'Edit Item',
+          style: GoogleFonts.outfit(),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -323,9 +343,7 @@ class _ItemCard extends StatelessWidget {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               ),
             ],
           ),
@@ -333,7 +351,7 @@ class _ItemCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
@@ -344,34 +362,37 @@ class _ItemCard extends StatelessWidget {
 
                 if (item == null) {
                   context.read<InventoryBloc>().add(
-                        AddItemEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                          quantity: quantity,
-                        ),
-                      );
+                    AddItemEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      quantity: quantity,
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateItemEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          itemId: item.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                          quantity: quantity,
-                        ),
-                      );
+                    UpdateItemEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      itemId: item.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      quantity: quantity,
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(item == null ? 'Add' : 'Save'),
+            child: Text(
+              item == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -382,32 +403,32 @@ class _ItemCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Item'),
-        content: Text('Are you sure you want to delete "${item.name}"?'),
+        title: Text('Delete Item', style: GoogleFonts.outfit()),
+        content: Text(
+          'Are you sure you want to delete "${item.name}"?',
+          style: GoogleFonts.outfit(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<InventoryBloc>().add(
-                    DeleteItemEvent(
-                      spaceId: space.id,
-                      storageId: storage.id,
-                      itemId: item.id,
-                    ),
-                  );
+                DeleteItemEvent(
+                  spaceId: space.id,
+                  storageId: storage.id,
+                  itemId: item.id,
+                ),
+              );
               Navigator.pop(dialogContext);
             },
-            child: const Text('Delete'),
+            child: Text('Delete', style: GoogleFonts.outfit()),
           ),
         ],
       ),
     );
   }
 }
-

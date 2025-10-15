@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/animated_page_wrapper.dart';
@@ -16,7 +17,14 @@ class SpacesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Spaces'),
+        title: Text(
+          'Spaces',
+          style: GoogleFonts.outfit(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         elevation: 2,
       ),
       body: BlocBuilder<InventoryBloc, InventoryState>(
@@ -32,13 +40,13 @@ class SpacesPage extends StatelessWidget {
                 children: [
                   const Icon(Icons.error_outline, size: 60, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(state.message),
+                  Text(state.message, style: GoogleFonts.outfit()),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       context.read<InventoryBloc>().add(LoadSpacesEvent());
                     },
-                    child: const Text('Retry'),
+                    child: Text('Retry', style: GoogleFonts.outfit()),
                   ),
                 ],
               ),
@@ -62,7 +70,7 @@ class SpacesPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         'No spaces yet',
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: 18,
                           color: AppColors.black,
                         ),
@@ -70,7 +78,7 @@ class SpacesPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         'Tap + to create your first space',
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: 14,
                           color: AppColors.grey,
                         ),
@@ -108,12 +116,17 @@ class SpacesPage extends StatelessWidget {
 
   void _showAddEditSpaceDialog(BuildContext context, {SpaceEntity? space}) {
     final nameController = TextEditingController(text: space?.name ?? '');
-    final descriptionController = TextEditingController(text: space?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: space?.description ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(space == null ? 'Add Space' : 'Edit Space'),
+        title: Text(
+          space == null ? 'Add Space' : 'Edit Space',
+          style: GoogleFonts.outfit(),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -139,35 +152,38 @@ class SpacesPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
                 if (space == null) {
                   context.read<InventoryBloc>().add(
-                        AddSpaceEvent(
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    AddSpaceEvent(
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateSpaceEvent(
-                          id: space.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    UpdateSpaceEvent(
+                      id: space.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(space == null ? 'Add' : 'Save'),
+            child: Text(
+              space == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -188,12 +204,12 @@ class _SpaceCard extends StatelessWidget {
         leading: CircleAvatar(
           child: Text(
             space.name.substring(0, 1).toUpperCase(),
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
           ),
         ),
         title: Text(
           space.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,32 +221,29 @@ class _SpaceCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '${space.storages.length} storage${space.storages.length != 1 ? 's' : ''}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),
         trailing: PopupMenuButton(
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit, size: 20),
-                  SizedBox(width: 8),
-                  Text('Edit'),
+                  const Icon(Icons.edit, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Edit', style: GoogleFonts.outfit()),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, size: 20, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text('Delete', style: GoogleFonts.outfit(color: Colors.red)),
                 ],
               ),
             ),
@@ -245,10 +258,7 @@ class _SpaceCard extends StatelessWidget {
         ),
         onTap: () {
           // Navigate using named route
-          NavigationService.navigateTo(
-            AppRoutes.storages,
-            arguments: space,
-          );
+          NavigationService.navigateTo(AppRoutes.storages, arguments: space);
         },
       ),
     );
@@ -256,12 +266,17 @@ class _SpaceCard extends StatelessWidget {
 
   void _showAddEditSpaceDialog(BuildContext context, {SpaceEntity? space}) {
     final nameController = TextEditingController(text: space?.name ?? '');
-    final descriptionController = TextEditingController(text: space?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: space?.description ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(space == null ? 'Add Space' : 'Edit Space'),
+        title: Text(
+          space == null ? 'Add Space' : 'Edit Space',
+          style: GoogleFonts.outfit(),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -287,35 +302,38 @@ class _SpaceCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
                 if (space == null) {
                   context.read<InventoryBloc>().add(
-                        AddSpaceEvent(
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    AddSpaceEvent(
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateSpaceEvent(
-                          id: space.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    UpdateSpaceEvent(
+                      id: space.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(space == null ? 'Add' : 'Save'),
+            child: Text(
+              space == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -326,26 +344,26 @@ class _SpaceCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Space'),
-        content: Text('Are you sure you want to delete "${space.name}"? This will also delete all storages and items within it.'),
+        title: Text('Delete Space', style: GoogleFonts.outfit()),
+        content: Text(
+          'Are you sure you want to delete "${space.name}"? This will also delete all storages and items within it.',
+          style: GoogleFonts.outfit(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<InventoryBloc>().add(DeleteSpaceEvent(id: space.id));
               Navigator.pop(dialogContext);
             },
-            child: const Text('Delete'),
+            child: Text('Delete', style: GoogleFonts.outfit()),
           ),
         ],
       ),
     );
   }
 }
-

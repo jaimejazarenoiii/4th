@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/animated_page_wrapper.dart';
@@ -19,7 +20,14 @@ class StoragesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(space.name),
+        title: Text(
+          space.name,
+          style: GoogleFonts.outfit(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         elevation: 2,
       ),
       body: BlocBuilder<InventoryBloc, InventoryState>(
@@ -30,12 +38,16 @@ class StoragesPage extends StatelessWidget {
             try {
               currentSpace = state.spaces.firstWhere((s) => s.id == space.id);
             } catch (e) {
-              return const Center(child: Text('Space not found'));
+              return Center(
+                child: Text('Space not found', style: GoogleFonts.outfit()),
+              );
             }
           }
 
           if (currentSpace == null) {
-            return const Center(child: Text('Space not found'));
+            return Center(
+              child: Text('Space not found', style: GoogleFonts.outfit()),
+            );
           }
 
           if (currentSpace.storages.isEmpty) {
@@ -54,7 +66,7 @@ class StoragesPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'No storages yet',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 18,
                         color: AppColors.black,
                       ),
@@ -62,7 +74,7 @@ class StoragesPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Tap + to create your first storage',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: 14,
                         color: AppColors.grey,
                       ),
@@ -82,10 +94,7 @@ class StoragesPage extends StatelessWidget {
                 duration: const Duration(milliseconds: 400),
                 delay: Duration(milliseconds: 50 * index),
                 offsetY: 20,
-                child: _StorageCard(
-                  space: currentSpace,
-                  storage: storage,
-                ),
+                child: _StorageCard(space: currentSpace, storage: storage),
               );
             },
           );
@@ -98,14 +107,22 @@ class StoragesPage extends StatelessWidget {
     );
   }
 
-  void _showAddEditStorageDialog(BuildContext context, {StorageEntity? storage}) {
+  void _showAddEditStorageDialog(
+    BuildContext context, {
+    StorageEntity? storage,
+  }) {
     final nameController = TextEditingController(text: storage?.name ?? '');
-    final descriptionController = TextEditingController(text: storage?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: storage?.description ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(storage == null ? 'Add Storage' : 'Edit Storage'),
+        title: Text(
+          storage == null ? 'Add Storage' : 'Edit Storage',
+          style: GoogleFonts.outfit(),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -131,37 +148,40 @@ class StoragesPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
                 if (storage == null) {
                   context.read<InventoryBloc>().add(
-                        AddStorageEvent(
-                          spaceId: space.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    AddStorageEvent(
+                      spaceId: space.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateStorageEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    UpdateStorageEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(storage == null ? 'Add' : 'Save'),
+            child: Text(
+              storage == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -173,10 +193,7 @@ class _StorageCard extends StatelessWidget {
   final SpaceEntity space;
   final StorageEntity storage;
 
-  const _StorageCard({
-    required this.space,
-    required this.storage,
-  });
+  const _StorageCard({required this.space, required this.storage});
 
   @override
   Widget build(BuildContext context) {
@@ -191,51 +208,46 @@ class _StorageCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.blue[100],
-          child: Icon(
-            Icons.storage,
-            color: Colors.blue[700],
-          ),
+          child: Icon(Icons.storage, color: Colors.blue[700]),
         ),
         title: Text(
           storage.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (storage.description != null && storage.description!.isNotEmpty) ...[
+            if (storage.description != null &&
+                storage.description!.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(storage.description!),
             ],
             const SizedBox(height: 4),
             Text(
               '$totalItems item${totalItems != 1 ? 's' : ''}${totalQuantity > 0 ? ' · $totalQuantity total qty' : ''}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),
         trailing: PopupMenuButton(
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit, size: 20),
-                  SizedBox(width: 8),
-                  Text('Edit'),
+                  const Icon(Icons.edit, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Edit', style: GoogleFonts.outfit()),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, size: 20, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text('Delete', style: GoogleFonts.outfit(color: Colors.red)),
                 ],
               ),
             ),
@@ -252,24 +264,29 @@ class _StorageCard extends StatelessWidget {
           // Navigate using named route
           NavigationService.navigateTo(
             AppRoutes.items,
-            arguments: {
-              'space': space,
-              'storage': storage,
-            },
+            arguments: {'space': space, 'storage': storage},
           );
         },
       ),
     );
   }
 
-  void _showAddEditStorageDialog(BuildContext context, {StorageEntity? storage}) {
+  void _showAddEditStorageDialog(
+    BuildContext context, {
+    StorageEntity? storage,
+  }) {
     final nameController = TextEditingController(text: storage?.name ?? '');
-    final descriptionController = TextEditingController(text: storage?.description ?? '');
+    final descriptionController = TextEditingController(
+      text: storage?.description ?? '',
+    );
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(storage == null ? 'Add Storage' : 'Edit Storage'),
+        title: Text(
+          storage == null ? 'Add Storage' : 'Edit Storage',
+          style: GoogleFonts.outfit(),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -295,37 +312,40 @@ class _StorageCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
                 if (storage == null) {
                   context.read<InventoryBloc>().add(
-                        AddStorageEvent(
-                          spaceId: space.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    AddStorageEvent(
+                      spaceId: space.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 } else {
                   context.read<InventoryBloc>().add(
-                        UpdateStorageEvent(
-                          spaceId: space.id,
-                          storageId: storage.id,
-                          name: nameController.text.trim(),
-                          description: descriptionController.text.trim().isEmpty
-                              ? null
-                              : descriptionController.text.trim(),
-                        ),
-                      );
+                    UpdateStorageEvent(
+                      spaceId: space.id,
+                      storageId: storage.id,
+                      name: nameController.text.trim(),
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                    ),
+                  );
                 }
                 Navigator.pop(dialogContext);
               }
             },
-            child: Text(storage == null ? 'Add' : 'Save'),
+            child: Text(
+              storage == null ? 'Add' : 'Save',
+              style: GoogleFonts.outfit(),
+            ),
           ),
         ],
       ),
@@ -336,31 +356,28 @@ class _StorageCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Storage'),
-        content: Text('Are you sure you want to delete "${storage.name}"? This will also delete all items within it.'),
+        title: Text('Delete Storage', style: GoogleFonts.outfit()),
+        content: Text(
+          'Are you sure you want to delete "${storage.name}"? This will also delete all items within it.',
+          style: GoogleFonts.outfit(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: GoogleFonts.outfit()),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<InventoryBloc>().add(
-                    DeleteStorageEvent(
-                      spaceId: space.id,
-                      storageId: storage.id,
-                    ),
-                  );
+                DeleteStorageEvent(spaceId: space.id, storageId: storage.id),
+              );
               Navigator.pop(dialogContext);
             },
-            child: const Text('Delete'),
+            child: Text('Delete', style: GoogleFonts.outfit()),
           ),
         ],
       ),
     );
   }
 }
-

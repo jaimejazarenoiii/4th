@@ -16,19 +16,21 @@ class WelcomePage extends StatelessWidget {
     showAuthBottomSheet(context, false);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
+        left: false,
+        right: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
               // Top spacing
               const SizedBox(height: 40),
-              
+
               // Main illustration with fade and slide
               AnimatedFadeSlide(
                 duration: const Duration(milliseconds: 600),
@@ -44,9 +46,9 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Title with fade and slide
               AnimatedFadeSlide(
                 duration: const Duration(milliseconds: 600),
@@ -63,9 +65,9 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Subtitle with fade and slide
               AnimatedFadeSlide(
                 duration: const Duration(milliseconds: 600),
@@ -82,9 +84,9 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Buttons with fade and slide
               AnimatedFadeSlide(
                 duration: const Duration(milliseconds: 600),
@@ -101,7 +103,10 @@ class WelcomePage extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: () => _showSignInBottomSheet(context),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.black, width: 1),
+                              side: const BorderSide(
+                                color: AppColors.black,
+                                width: 1,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -117,9 +122,9 @@ class WelcomePage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(width: 12),
-                      
+
                       // Sign up button
                       Expanded(
                         child: SizedBox(
@@ -154,4 +159,3 @@ class WelcomePage extends StatelessWidget {
     );
   }
 }
-

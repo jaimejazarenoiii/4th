@@ -18,11 +18,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required SignIn signIn,
     required SignUp signUp,
     required SignOut signOut,
-  })  : _checkAuthStatus = checkAuthStatus,
-        _signIn = signIn,
-        _signUp = signUp,
-        _signOut = signOut,
-        super(const AuthInitial()) {
+  }) : _checkAuthStatus = checkAuthStatus,
+       _signIn = signIn,
+       _signUp = signUp,
+       _signOut = signOut,
+       super(const AuthInitial()) {
     on<CheckAuthStatusEvent>(_onCheckAuthStatus);
     on<SignInEvent>(_onSignIn);
     on<SignUpEvent>(_onSignUp);
@@ -34,64 +34,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthChecking());
-    
+
     final result = await _checkAuthStatus(const NoParams());
-    
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (authEntity) {
-        if (authEntity.isAuthenticated && authEntity.isValid) {
-          emit(AuthAuthenticated(authEntity));
-        } else {
-          emit(const AuthUnauthenticated());
-        }
-      },
-    );
+
+    result.fold((failure) => emit(AuthError(failure.message)), (authEntity) {
+      if (authEntity.isAuthenticated && authEntity.isValid) {
+        emit(AuthAuthenticated(authEntity));
+      } else {
+        emit(const AuthUnauthenticated());
+      }
+    });
   }
 
-  Future<void> _onSignIn(
-    SignInEvent event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onSignIn(SignInEvent event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
-    
-    final result = await _signIn(SignInParams(
-      email: event.email,
-      password: event.password,
-    ));
-    
+
+    final result = await _signIn(
+      SignInParams(email: event.email, password: event.password),
+    );
+
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (authEntity) => emit(AuthAuthenticated(authEntity)),
     );
   }
 
-  Future<void> _onSignUp(
-    SignUpEvent event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onSignUp(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
-    
-    final result = await _signUp(SignUpParams(
-      email: event.email,
-      password: event.password,
-      name: event.name,
-    ));
-    
+
+    final result = await _signUp(
+      SignUpParams(email: event.email, password: event.password),
+    );
+
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (authEntity) => emit(AuthAuthenticated(authEntity)),
     );
   }
 
-  Future<void> _onSignOut(
-    SignOutEvent event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onSignOut(SignOutEvent event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
-    
+
     final result = await _signOut(const NoParams());
-    
+
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (_) => emit(const AuthUnauthenticated()),
