@@ -13,6 +13,7 @@ import '../../features/auth/domain/usecases/sign_up.dart';
 import '../../features/auth/domain/usecases/sign_out.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/inventory/data/datasources/inventory_local_data_source.dart';
+import '../../features/inventory/data/datasources/inventory_remote_data_source.dart';
 import '../../features/inventory/data/repositories/inventory_repository_impl.dart';
 import '../../features/inventory/domain/repositories/inventory_repository.dart';
 import '../../features/inventory/domain/usecases/get_spaces.dart';
@@ -21,7 +22,19 @@ import '../../features/inventory/domain/usecases/update_space.dart';
 import '../../features/inventory/domain/usecases/delete_space.dart';
 import '../../features/inventory/domain/usecases/storage_usecases.dart';
 import '../../features/inventory/domain/usecases/item_usecases.dart';
+import '../../features/inventory/domain/usecases/category_usecases.dart';
 import '../../features/inventory/presentation/bloc/inventory_bloc.dart';
+import '../../features/inventory/presentation/bloc/create_space_bloc.dart';
+import '../../features/inventory/presentation/bloc/create_storage_bloc.dart';
+import '../../features/inventory/presentation/bloc/create_item_bloc.dart';
+import '../../features/inventory/presentation/bloc/location_selection_bloc.dart';
+import '../../features/inventory/presentation/bloc/storage_details_bloc.dart';
+import '../../features/inventory/presentation/bloc/item_details_bloc.dart';
+import '../../features/dashboard/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
+import '../../features/dashboard/domain/usecases/get_dashboard_data.dart';
+import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -65,26 +78,74 @@ Future<void> init() async {
     ),
   );
 
+  // Create Space Bloc
+  sl.registerFactory(() => CreateSpaceBloc(addSpace: sl()));
+
+  // Create Storage Bloc
+  sl.registerFactory(() => CreateStorageBloc(addStorage: sl()));
+
+  // Create Item Bloc
+  sl.registerFactory(
+    () => CreateItemBloc(
+      addItem: sl(),
+      updateItem: sl(),
+      getCategories: sl(),
+      createCategory: sl(),
+    ),
+  );
+
+  // Location Selection Bloc
+  sl.registerFactory(() => LocationSelectionBloc(repository: sl()));
+
+  // Storage Details Bloc
+  sl.registerFactory(() => StorageDetailsBloc(repository: sl()));
+
+  // Item Details Bloc
+  sl.registerFactory(() => ItemDetailsBloc(repository: sl()));
+
+  //! Features - Dashboard
+  // Bloc
+  sl.registerFactory(() => DashboardBloc(getDashboardData: sl()));
+
+  // Use cases
+  sl.registerLazySingleton(() => GetDashboardData(sl()));
+
+  // Repository
+  sl.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<DashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(dioClient: sl()),
+  );
+
   // Use cases
   sl.registerLazySingleton(() => GetSpaces(sl()));
   sl.registerLazySingleton(() => AddSpace(sl()));
+  sl.registerLazySingleton(() => AddStorage(sl()));
   sl.registerLazySingleton(() => UpdateSpace(sl()));
   sl.registerLazySingleton(() => DeleteSpace(sl()));
-  sl.registerLazySingleton(() => AddStorage(sl()));
   sl.registerLazySingleton(() => UpdateStorage(sl()));
   sl.registerLazySingleton(() => DeleteStorage(sl()));
   sl.registerLazySingleton(() => AddItem(sl()));
   sl.registerLazySingleton(() => UpdateItem(sl()));
   sl.registerLazySingleton(() => DeleteItem(sl()));
+  sl.registerLazySingleton(() => GetCategories(sl()));
+  sl.registerLazySingleton(() => CreateCategory(sl()));
 
   // Repository
   sl.registerLazySingleton<InventoryRepository>(
-    () => InventoryRepositoryImpl(localDataSource: sl()),
+    () =>
+        InventoryRepositoryImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
 
   // Data sources
   sl.registerLazySingleton<InventoryLocalDataSource>(
     () => InventoryLocalDataSourceImpl(sharedPreferences: sl(), uuid: sl()),
+  );
+  sl.registerLazySingleton<InventoryRemoteDataSource>(
+    () => InventoryRemoteDataSourceImpl(dioClient: sl()),
   );
 
   //! Core

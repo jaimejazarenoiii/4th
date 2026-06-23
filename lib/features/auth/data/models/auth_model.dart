@@ -27,8 +27,20 @@ class AuthModel extends AuthEntity {
     AuthDataModel data, {
     String? fallbackName,
   }) {
+    // If no token, return logged-out model (for sign-up case)
+    if (data.token == null) {
+      return AuthModel(
+        token: '',
+        userId: data.user.id,
+        email: data.user.email,
+        name: data.user.name ?? fallbackName,
+        expiresAt: DateTime.now(),
+        isAuthenticated: false,
+      );
+    }
+    
     return AuthModel(
-      token: data.token,
+      token: data.token!,
       userId: data.user.id,
       email: data.user.email,
       name: data.user.name ?? fallbackName,

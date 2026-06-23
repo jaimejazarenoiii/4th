@@ -10,6 +10,7 @@ class SpaceCard extends StatelessWidget {
   final int totalStorages;
   final int totalItems;
   final VoidCallback onTap;
+  final String? imageUrl;
 
   const SpaceCard({
     super.key,
@@ -18,6 +19,7 @@ class SpaceCard extends StatelessWidget {
     required this.totalStorages,
     required this.totalItems,
     required this.onTap,
+    this.imageUrl,
   });
 
   @override
@@ -33,14 +35,22 @@ class SpaceCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              AssetConstants.spaceDefaultImage,
-              height: 176,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              cacheHeight: 176, // Cache at display size for better memory usage
-              gaplessPlayback: true, // Smoother image transitions
-            ),
+            imageUrl != null
+                ? Image.network(
+                    imageUrl!,
+                    height: 176,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    // image network does not have cacheHeight or gaplessPlayback
+                  )
+                : Image.asset(
+                    AssetConstants.spaceDefaultImage,
+                    height: 176,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    cacheHeight: 176,
+                    gaplessPlayback: true,
+                  ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),

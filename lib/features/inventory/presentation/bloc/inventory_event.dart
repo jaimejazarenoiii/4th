@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 abstract class InventoryEvent extends Equatable {
@@ -14,11 +15,12 @@ class LoadSpacesEvent extends InventoryEvent {}
 class AddSpaceEvent extends InventoryEvent {
   final String name;
   final String? description;
+  final File? image;
 
-  const AddSpaceEvent({required this.name, this.description});
+  const AddSpaceEvent({required this.name, this.description, this.image});
 
   @override
-  List<Object?> get props => [name, description];
+  List<Object?> get props => [name, description, image];
 }
 
 class UpdateSpaceEvent extends InventoryEvent {
@@ -82,10 +84,7 @@ class DeleteStorageEvent extends InventoryEvent {
   final String spaceId;
   final String storageId;
 
-  const DeleteStorageEvent({
-    required this.spaceId,
-    required this.storageId,
-  });
+  const DeleteStorageEvent({required this.spaceId, required this.storageId});
 
   @override
   List<Object> get props => [spaceId, storageId];
@@ -129,7 +128,14 @@ class UpdateItemEvent extends InventoryEvent {
   });
 
   @override
-  List<Object?> get props => [spaceId, storageId, itemId, name, description, quantity];
+  List<Object?> get props => [
+    spaceId,
+    storageId,
+    itemId,
+    name,
+    description,
+    quantity,
+  ];
 }
 
 class DeleteItemEvent extends InventoryEvent {
@@ -146,4 +152,3 @@ class DeleteItemEvent extends InventoryEvent {
   @override
   List<Object> get props => [spaceId, storageId, itemId];
 }
-

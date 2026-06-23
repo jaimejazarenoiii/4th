@@ -144,9 +144,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final authResult = _handleAuthResponse(response.data);
 
       return authResult.fold((failure) => Left(failure), (authData) async {
-        // Set the auth token for future requests
-        _dioClient.setAuthToken(authData.token);
-        await _jwtStorageService.storeAuthData(authData);
+        // For sign-up, if there's no token, don't store auth data
+        // The user needs to sign in to get a token
+        if (authData.token.isNotEmpty) {
+          // Set the auth token for future requests
+          _dioClient.setAuthToken(authData.token);
+          await _jwtStorageService.storeAuthData(authData);
+        }
         return Right(authData);
       });
     } on DioException catch (e) {

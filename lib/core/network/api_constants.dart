@@ -9,9 +9,11 @@ class ApiConstants {
 
   // Endpoints
   // Add your API endpoints here
+  static const String dashboard = 'dashboard';
   static const String spaces = 'spaces';
   static const String storages = 'storages';
   static const String items = 'items';
+  static const String categories = 'categories';
 
   // Headers
   static const String contentType = 'application/json';

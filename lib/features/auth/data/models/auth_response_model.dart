@@ -44,19 +44,22 @@ class StatusModel {
 
 class AuthDataModel {
   final UserModel user;
-  final String token;
+  final String? token;
 
-  const AuthDataModel({required this.user, required this.token});
+  const AuthDataModel({required this.user, this.token});
 
   factory AuthDataModel.fromJson(Map<String, dynamic> json) {
     return AuthDataModel(
       user: UserModel.fromJson(json['user']),
-      token: json['token'] as String,
+      token: json['token'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'user': user.toJson(), 'token': token};
+    return {
+      'user': user.toJson(),
+      if (token != null) 'token': token,
+    };
   }
 }
 

@@ -41,3 +41,12 @@ class AuthError extends AuthState {
 class AuthChecking extends AuthState {
   const AuthChecking();
 }
+
+class SignUpSuccess extends AuthState {
+  final String email;
+
+  const SignUpSuccess({required this.email});
+
+  @override
+  List<Object> get props => [email];
+}

@@ -68,7 +68,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) => emit(AuthError(failure.message)),
-      (authEntity) => emit(AuthAuthenticated(authEntity)),
+      (authEntity) {
+        // If sign-up succeeded but no token, user needs to sign in
+        if (authEntity.token.isEmpty || !authEntity.isAuthenticated) {
+          emit(SignUpSuccess(email: authEntity.email));
+        } else {
+          emit(AuthAuthenticated(authEntity));
+        }
+      },
     );
   }
 

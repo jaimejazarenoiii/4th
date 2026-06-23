@@ -132,6 +132,43 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
           NavigationService.showSuccess('Signed in successfully!');
           Navigator.pop(context);
           NavigationService.replaceWith(AppRoutes.dashboard);
+        } else if (state is SignUpSuccess) {
+          // Dismiss the bottom sheet first
+          Navigator.pop(context);
+          // Show alert dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                'Account Created',
+                style: GoogleFonts.outfit(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
+              content: Text(
+                'Your account has been created successfully! Please sign in to continue.',
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
+                  color: AppColors.black,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'OK',
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
         } else if (state is AuthError) {
           // Animated error overlay using a FadeTransition (with AnimationController and OverlayEntry)
           _showValidationError(state.message);

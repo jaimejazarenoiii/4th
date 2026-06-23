@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/error/failures.dart';
@@ -18,6 +19,10 @@ class AddItem implements UseCase<void, AddItemParams> {
       params.name,
       params.description,
       params.quantity,
+      params.expiryDate,
+      params.unit,
+      params.categoryIds,
+      params.image,
     );
   }
 }
@@ -28,6 +33,10 @@ class AddItemParams extends Equatable {
   final String name;
   final String? description;
   final int? quantity;
+  final String? expiryDate;
+  final String? unit;
+  final List<int>? categoryIds;
+  final File? image;
 
   const AddItemParams({
     required this.spaceId,
@@ -35,10 +44,24 @@ class AddItemParams extends Equatable {
     required this.name,
     this.description,
     this.quantity,
+    this.expiryDate,
+    this.unit,
+    this.categoryIds,
+    this.image,
   });
 
   @override
-  List<Object?> get props => [spaceId, storageId, name, description, quantity];
+  List<Object?> get props => [
+        spaceId,
+        storageId,
+        name,
+        description,
+        quantity,
+        expiryDate,
+        unit,
+        categoryIds,
+        image,
+      ];
 }
 
 // Update Item

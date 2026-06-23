@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../../domain/entities/space_entity.dart';
 import 'storage_model.dart';
 
@@ -6,6 +7,7 @@ class SpaceModel extends SpaceEntity {
     required super.id,
     required super.name,
     super.description,
+    super.image,
     required super.storages,
     required super.createdAt,
     required super.updatedAt,
@@ -16,7 +18,9 @@ class SpaceModel extends SpaceEntity {
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      storages: (json['storages'] as List<dynamic>?)
+      image: json['image'] != null ? File(json['image']) : null,
+      storages:
+          (json['storages'] as List<dynamic>?)
               ?.map((storage) => StorageModel.fromJson(storage))
               .toList() ??
           [],
@@ -30,7 +34,10 @@ class SpaceModel extends SpaceEntity {
       'id': id,
       'name': name,
       'description': description,
-      'storages': storages.map((storage) => (storage as StorageModel).toJson()).toList(),
+      'image': image?.path,
+      'storages': storages
+          .map((storage) => (storage as StorageModel).toJson())
+          .toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -39,6 +46,7 @@ class SpaceModel extends SpaceEntity {
   SpaceModel copyWith({
     String? name,
     String? description,
+    File? image,
     List<StorageModel>? storages,
     DateTime? updatedAt,
   }) {
@@ -46,10 +54,10 @@ class SpaceModel extends SpaceEntity {
       id: id,
       name: name ?? this.name,
       description: description ?? this.description,
+      image: image ?? this.image,
       storages: storages ?? this.storages,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
-

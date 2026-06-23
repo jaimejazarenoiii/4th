@@ -34,21 +34,24 @@ class StoragesPage extends StatelessWidget {
         builder: (context, state) {
           SpaceEntity? currentSpace;
 
+          if (state is InventoryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (state is InventoryLoaded) {
             try {
               currentSpace = state.spaces.firstWhere((s) => s.id == space.id);
             } catch (e) {
-              return Center(
-                child: Text('Space not found', style: GoogleFonts.outfit()),
-              );
+              // If space not found in bloc state, use the passed-in space as fallback
+              currentSpace = space;
             }
+          } else if (state is InventoryInitial || state is InventoryError) {
+            // If state is initial or error, use the passed-in space
+            currentSpace = space;
           }
 
-          if (currentSpace == null) {
-            return Center(
-              child: Text('Space not found', style: GoogleFonts.outfit()),
-            );
-          }
+          // Final fallback - use passed-in space if still null
+          currentSpace ??= space;
 
           if (currentSpace.storages.isEmpty) {
             return Center(
@@ -198,9 +201,9 @@ class _StorageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final totalItems = storage.items.length;
-    final totalQuantity = storage.items.fold<int>(
-      0,
-      (sum, item) => sum + (item.quantity ?? 0),
+    final totalQuantity = storage.items.fold<double>(
+      0.0,
+      (sum, item) => sum + item.quantity,
     );
 
     return Card(
@@ -224,7 +227,7 @@ class _StorageCard extends StatelessWidget {
             ],
             const SizedBox(height: 4),
             Text(
-              '$totalItems item${totalItems != 1 ? 's' : ''}${totalQuantity > 0 ? ' · $totalQuantity total qty' : ''}',
+              '$totalItems item${totalItems != 1 ? 's' : ''}${totalQuantity > 0 ? ' · ${totalQuantity.toStringAsFixed(totalQuantity.truncateToDouble() == totalQuantity ? 0 : 1)} total qty' : ''}',
               style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[600]),
             ),
           ],

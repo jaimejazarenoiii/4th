@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/space_model.dart';
@@ -8,14 +9,32 @@ import '../models/item_model.dart';
 abstract class InventoryLocalDataSource {
   Future<List<SpaceModel>> getSpaces();
   Future<void> saveSpaces(List<SpaceModel> spaces);
-  Future<void> addSpace(String name, String? description);
+  Future<void> addSpace(String name, String? description, File? image);
   Future<void> updateSpace(String id, String name, String? description);
   Future<void> deleteSpace(String id);
   Future<void> addStorage(String spaceId, String name, String? description);
-  Future<void> updateStorage(String spaceId, String storageId, String name, String? description);
+  Future<void> updateStorage(
+    String spaceId,
+    String storageId,
+    String name,
+    String? description,
+  );
   Future<void> deleteStorage(String spaceId, String storageId);
-  Future<void> addItem(String spaceId, String storageId, String name, String? description, int? quantity);
-  Future<void> updateItem(String spaceId, String storageId, String itemId, String name, String? description, int? quantity);
+  Future<void> addItem(
+    String spaceId,
+    String storageId,
+    String name,
+    String? description,
+    int? quantity,
+  );
+  Future<void> updateItem(
+    String spaceId,
+    String storageId,
+    String itemId,
+    String name,
+    String? description,
+    int? quantity,
+  );
   Future<void> deleteItem(String spaceId, String storageId, String itemId);
 }
 
@@ -48,13 +67,14 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> addSpace(String name, String? description) async {
+  Future<void> addSpace(String name, String? description, File? image) async {
     final spaces = await getSpaces();
     final now = DateTime.now();
     final newSpace = SpaceModel(
       id: uuid.v4(),
       name: name,
       description: description,
+      image: image,
       storages: const [],
       createdAt: now,
       updatedAt: now,
@@ -85,7 +105,11 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> addStorage(String spaceId, String name, String? description) async {
+  Future<void> addStorage(
+    String spaceId,
+    String name,
+    String? description,
+  ) async {
     final spaces = await getSpaces();
     final spaceIndex = spaces.indexWhere((s) => s.id == spaceId);
     if (spaceIndex != -1) {
@@ -94,6 +118,13 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
         id: uuid.v4(),
         name: name,
         description: description,
+        spaceId: spaceId,
+        spaceName: spaces[spaceIndex].name,
+        parentId: null,
+        imageUrl: null,
+        childrenCount: 0,
+        itemsCount: 0,
+        children: const [],
         items: const [],
         createdAt: now,
         updatedAt: now,
@@ -101,7 +132,7 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
       final updatedStorages = List<StorageModel>.from(
         spaces[spaceIndex].storages.map((s) => s as StorageModel),
       )..add(newStorage);
-      
+
       spaces[spaceIndex] = spaces[spaceIndex].copyWith(
         storages: updatedStorages,
         updatedAt: now,
@@ -111,7 +142,12 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> updateStorage(String spaceId, String storageId, String name, String? description) async {
+  Future<void> updateStorage(
+    String spaceId,
+    String storageId,
+    String name,
+    String? description,
+  ) async {
     final spaces = await getSpaces();
     final spaceIndex = spaces.indexWhere((s) => s.id == spaceId);
     if (spaceIndex != -1) {
@@ -143,7 +179,7 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
       final updatedStorages = List<StorageModel>.from(
         spaces[spaceIndex].storages.map((s) => s as StorageModel),
       )..removeWhere((st) => st.id == storageId);
-      
+
       spaces[spaceIndex] = spaces[spaceIndex].copyWith(
         storages: updatedStorages,
         updatedAt: DateTime.now(),
@@ -153,7 +189,13 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> addItem(String spaceId, String storageId, String name, String? description, int? quantity) async {
+  Future<void> addItem(
+    String spaceId,
+    String storageId,
+    String name,
+    String? description,
+    int? quantity,
+  ) async {
     final spaces = await getSpaces();
     final spaceIndex = spaces.indexWhere((s) => s.id == spaceId);
     if (spaceIndex != -1) {
@@ -166,15 +208,24 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
         final newItem = ItemModel(
           id: uuid.v4(),
           name: name,
-          description: description,
-          quantity: quantity,
+          quantity: quantity?.toDouble() ?? 0.0,
+          unit: 'pcs',
+          minQuantity: null,
+          outOfStockThreshold: null,
+          lowStockAlertEnabled: false,
+          outOfStockAlertEnabled: false,
+          expirationDate: null,
+          notes: description,
+          imageUrl: null,
+          lowStock: false,
+          outOfStock: false,
           createdAt: now,
           updatedAt: now,
         );
         final updatedItems = List<ItemModel>.from(
           storages[storageIndex].items.map((i) => i as ItemModel),
         )..add(newItem);
-        
+
         storages[storageIndex] = storages[storageIndex].copyWith(
           items: updatedItems,
           updatedAt: now,
@@ -189,7 +240,14 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> updateItem(String spaceId, String storageId, String itemId, String name, String? description, int? quantity) async {
+  Future<void> updateItem(
+    String spaceId,
+    String storageId,
+    String itemId,
+    String name,
+    String? description,
+    int? quantity,
+  ) async {
     final spaces = await getSpaces();
     final spaceIndex = spaces.indexWhere((s) => s.id == spaceId);
     if (spaceIndex != -1) {
@@ -206,8 +264,8 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
           final now = DateTime.now();
           items[itemIndex] = items[itemIndex].copyWith(
             name: name,
-            description: description,
-            quantity: quantity,
+            notes: description,
+            quantity: quantity?.toDouble(),
             updatedAt: now,
           );
           storages[storageIndex] = storages[storageIndex].copyWith(
@@ -225,7 +283,11 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
-  Future<void> deleteItem(String spaceId, String storageId, String itemId) async {
+  Future<void> deleteItem(
+    String spaceId,
+    String storageId,
+    String itemId,
+  ) async {
     final spaces = await getSpaces();
     final spaceIndex = spaces.indexWhere((s) => s.id == spaceId);
     if (spaceIndex != -1) {
@@ -237,7 +299,7 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
         final updatedItems = List<ItemModel>.from(
           storages[storageIndex].items.map((i) => i as ItemModel),
         )..removeWhere((i) => i.id == itemId);
-        
+
         final now = DateTime.now();
         storages[storageIndex] = storages[storageIndex].copyWith(
           items: updatedItems,
@@ -252,4 +314,3 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
     }
   }
 }
-

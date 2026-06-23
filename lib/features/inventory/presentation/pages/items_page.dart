@@ -35,6 +35,10 @@ class ItemsPage extends StatelessWidget {
         builder: (context, state) {
           StorageEntity? currentStorage;
 
+          if (state is InventoryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (state is InventoryLoaded) {
             try {
               final currentSpace = state.spaces.firstWhere(
@@ -44,17 +48,16 @@ class ItemsPage extends StatelessWidget {
                 (st) => st.id == storage.id,
               );
             } catch (e) {
-              return Center(
-                child: Text('Storage not found', style: GoogleFonts.outfit()),
-              );
+              // If storage not found in bloc state, use the passed-in storage as fallback
+              currentStorage = storage;
             }
+          } else if (state is InventoryInitial || state is InventoryError) {
+            // If state is initial or error, use the passed-in storage
+            currentStorage = storage;
           }
 
-          if (currentStorage == null) {
-            return Center(
-              child: Text('Storage not found', style: GoogleFonts.outfit()),
-            );
-          }
+          // Final fallback - use passed-in storage if still null
+          currentStorage ??= storage;
 
           if (currentStorage.items.isEmpty) {
             return Center(
@@ -119,11 +122,9 @@ class ItemsPage extends StatelessWidget {
 
   void _showAddEditItemDialog(BuildContext context, {ItemEntity? item}) {
     final nameController = TextEditingController(text: item?.name ?? '');
-    final descriptionController = TextEditingController(
-      text: item?.description ?? '',
-    );
+    final notesController = TextEditingController(text: item?.notes ?? '');
     final quantityController = TextEditingController(
-      text: item?.quantity?.toString() ?? '',
+      text: item?.quantity.toString() ?? '',
     );
 
     showDialog(
@@ -147,9 +148,9 @@ class ItemsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: descriptionController,
+                controller: notesController,
                 decoration: const InputDecoration(
-                  labelText: 'Description (optional)',
+                  labelText: 'Notes (optional)',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -158,11 +159,15 @@ class ItemsPage extends StatelessWidget {
               TextField(
                 controller: quantityController,
                 decoration: const InputDecoration(
-                  labelText: 'Quantity (optional)',
+                  labelText: 'Quantity',
                   border: OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                ],
               ),
             ],
           ),
@@ -175,9 +180,10 @@ class ItemsPage extends StatelessWidget {
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
-                final quantity = quantityController.text.trim().isEmpty
-                    ? null
-                    : int.tryParse(quantityController.text.trim());
+                final quantityText = quantityController.text.trim();
+                final quantity = quantityText.isEmpty
+                    ? 0.0
+                    : double.tryParse(quantityText) ?? 0.0;
 
                 if (item == null) {
                   context.read<InventoryBloc>().add(
@@ -185,10 +191,10 @@ class ItemsPage extends StatelessWidget {
                       spaceId: space.id,
                       storageId: storage.id,
                       name: nameController.text.trim(),
-                      description: descriptionController.text.trim().isEmpty
+                      description: notesController.text.trim().isEmpty
                           ? null
-                          : descriptionController.text.trim(),
-                      quantity: quantity,
+                          : notesController.text.trim(),
+                      quantity: quantity.toInt(),
                     ),
                   );
                 } else {
@@ -198,10 +204,10 @@ class ItemsPage extends StatelessWidget {
                       storageId: storage.id,
                       itemId: item.id,
                       name: nameController.text.trim(),
-                      description: descriptionController.text.trim().isEmpty
+                      description: notesController.text.trim().isEmpty
                           ? null
-                          : descriptionController.text.trim(),
-                      quantity: quantity,
+                          : notesController.text.trim(),
+                      quantity: quantity.toInt(),
                     ),
                   );
                 }
@@ -246,21 +252,19 @@ class _ItemCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (item.description != null && item.description!.isNotEmpty) ...[
+            if (item.notes != null && item.notes!.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(item.description!),
+              Text(item.notes!),
             ],
-            if (item.quantity != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Quantity: ${item.quantity}',
-                style: GoogleFonts.outfit(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
+            const SizedBox(height: 4),
+            Text(
+              'Quantity: ${item.quantity} ${item.unit}',
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
               ),
-            ],
+            ),
           ],
         ),
         trailing: PopupMenuButton(
@@ -300,11 +304,9 @@ class _ItemCard extends StatelessWidget {
 
   void _showAddEditItemDialog(BuildContext context, {ItemEntity? item}) {
     final nameController = TextEditingController(text: item?.name ?? '');
-    final descriptionController = TextEditingController(
-      text: item?.description ?? '',
-    );
+    final notesController = TextEditingController(text: item?.notes ?? '');
     final quantityController = TextEditingController(
-      text: item?.quantity?.toString() ?? '',
+      text: item?.quantity.toString() ?? '',
     );
 
     showDialog(
@@ -328,9 +330,9 @@ class _ItemCard extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: descriptionController,
+                controller: notesController,
                 decoration: const InputDecoration(
-                  labelText: 'Description (optional)',
+                  labelText: 'Notes (optional)',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -339,11 +341,15 @@ class _ItemCard extends StatelessWidget {
               TextField(
                 controller: quantityController,
                 decoration: const InputDecoration(
-                  labelText: 'Quantity (optional)',
+                  labelText: 'Quantity',
                   border: OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                ],
               ),
             ],
           ),
@@ -356,9 +362,10 @@ class _ItemCard extends StatelessWidget {
           FilledButton(
             onPressed: () {
               if (nameController.text.trim().isNotEmpty) {
-                final quantity = quantityController.text.trim().isEmpty
-                    ? null
-                    : int.tryParse(quantityController.text.trim());
+                final quantityText = quantityController.text.trim();
+                final quantity = quantityText.isEmpty
+                    ? 0.0
+                    : double.tryParse(quantityText) ?? 0.0;
 
                 if (item == null) {
                   context.read<InventoryBloc>().add(
@@ -366,10 +373,10 @@ class _ItemCard extends StatelessWidget {
                       spaceId: space.id,
                       storageId: storage.id,
                       name: nameController.text.trim(),
-                      description: descriptionController.text.trim().isEmpty
+                      description: notesController.text.trim().isEmpty
                           ? null
-                          : descriptionController.text.trim(),
-                      quantity: quantity,
+                          : notesController.text.trim(),
+                      quantity: quantity.toInt(),
                     ),
                   );
                 } else {
@@ -379,10 +386,10 @@ class _ItemCard extends StatelessWidget {
                       storageId: storage.id,
                       itemId: item.id,
                       name: nameController.text.trim(),
-                      description: descriptionController.text.trim().isEmpty
+                      description: notesController.text.trim().isEmpty
                           ? null
-                          : descriptionController.text.trim(),
-                      quantity: quantity,
+                          : notesController.text.trim(),
+                      quantity: quantity.toInt(),
                     ),
                   );
                 }

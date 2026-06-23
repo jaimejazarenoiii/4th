@@ -67,8 +67,8 @@ class _AppWrapperState extends State<AppWrapper> {
           } else if (state is AuthAuthenticated) {
             // Show dashboard for authenticated users
             return const DashboardPage();
-          } else if (state is AuthUnauthenticated) {
-            // Show welcome screen for unauthenticated users
+          } else if (state is AuthUnauthenticated || state is SignUpSuccess) {
+            // Show welcome screen for unauthenticated users or after successful sign-up
             return const WelcomePage();
           } else if (state is AuthLoading) {
             // Show loading screen during auth operations

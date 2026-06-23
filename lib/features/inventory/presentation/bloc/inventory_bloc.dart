@@ -62,10 +62,15 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     Emitter<InventoryState> emit,
   ) async {
     final result = await addSpace(
-      AddSpaceParams(name: event.name, description: event.description),
+      AddSpaceParams(
+        name: event.name,
+        description: event.description,
+        image: event.image,
+      ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to add space')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to add space')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -82,7 +87,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to update space')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to update space')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -93,7 +99,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
   ) async {
     final result = await deleteSpace(DeleteSpaceParams(id: event.id));
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to delete space')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to delete space')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -110,7 +117,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to add storage')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to add storage')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -128,7 +136,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to update storage')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to update storage')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -138,13 +147,11 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     Emitter<InventoryState> emit,
   ) async {
     final result = await deleteStorage(
-      DeleteStorageParams(
-        spaceId: event.spaceId,
-        storageId: event.storageId,
-      ),
+      DeleteStorageParams(spaceId: event.spaceId, storageId: event.storageId),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to delete storage')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to delete storage')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -163,7 +170,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to add item')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to add item')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -183,7 +191,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to update item')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to update item')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
@@ -200,9 +209,9 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ),
     );
     await result.fold(
-      (failure) async => emit(const InventoryError(message: 'Failed to delete item')),
+      (failure) async =>
+          emit(const InventoryError(message: 'Failed to delete item')),
       (_) async => add(LoadSpacesEvent()),
     );
   }
 }
-

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/error/failures.dart';
@@ -12,23 +13,39 @@ class AddStorage implements UseCase<void, AddStorageParams> {
 
   @override
   Future<Either<Failure, void>> call(AddStorageParams params) async {
-    return await repository.addStorage(params.spaceId, params.name, params.description);
+    return await repository.addStorage(
+      params.name,
+      params.description,
+      params.spaceId,
+      params.parentStorageId,
+      params.image,
+    );
   }
 }
 
 class AddStorageParams extends Equatable {
-  final String spaceId;
   final String name;
   final String? description;
+  final String spaceId;
+  final String? parentStorageId;
+  final File? image;
 
   const AddStorageParams({
-    required this.spaceId,
     required this.name,
     this.description,
+    required this.spaceId,
+    this.parentStorageId,
+    this.image,
   });
 
   @override
-  List<Object?> get props => [spaceId, name, description];
+  List<Object?> get props => [
+    name,
+    description,
+    spaceId,
+    parentStorageId,
+    image,
+  ];
 }
 
 // Update Storage
@@ -81,12 +98,8 @@ class DeleteStorageParams extends Equatable {
   final String spaceId;
   final String storageId;
 
-  const DeleteStorageParams({
-    required this.spaceId,
-    required this.storageId,
-  });
+  const DeleteStorageParams({required this.spaceId, required this.storageId});
 
   @override
   List<Object> get props => [spaceId, storageId];
 }
-

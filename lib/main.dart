@@ -9,6 +9,8 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/inventory/presentation/bloc/inventory_bloc.dart';
 import 'features/inventory/presentation/bloc/inventory_event.dart';
+import 'features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import 'features/dashboard/presentation/bloc/dashboard_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,16 +31,18 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => di.sl<InventoryBloc>()..add(LoadSpacesEvent()),
         ),
+        BlocProvider(
+          create: (_) => di.sl<DashboardBloc>()..add(const LoadDashboardData()),
+        ),
       ],
       child: MaterialApp(
         title: '4th',
         debugShowCheckedModeBanner: false,
-        
+
         // Navigation
         navigatorKey: NavigationService.navigatorKey,
         onGenerateRoute: RouteGenerator.generateRoute,
         home: const AppWrapper(), // Use AppWrapper instead of initialRoute
-        
         // Theme
         theme: ThemeData(
           // Use Outfit font from Google Fonts
